@@ -1,10 +1,16 @@
 package com.example.androidtv;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -14,44 +20,47 @@ import androidx.fragment.app.FragmentActivity;
 import java.util.Calendar;
 
 public class MainActivity extends FragmentActivity {
-    TimePicker alarmTimePicker;
-    PendingIntent pendingIntent;
-    AlarmManager alarmManager;
+
+    TextView txtDateTime;
+    Button btnTime, btnDate;
+    Calendar dateTime = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        alarmTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-    }
-
-    public void OnToggleClicked(View view) {
-        long time;
-        if (((ToggleButton) view).isChecked()) {
-            Toast.makeText(MainActivity.this, "ALARM ON", Toast.LENGTH_SHORT).show();
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
-            calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
-
-            Intent intent = new Intent(this, Alarm.class);
-
-            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-            time = (calendar.getTimeInMillis() - (calendar.getTimeInMillis() % 60000));
-            if (System.currentTimeMillis() > time) {
-                if (calendar.AM_PM == 0)
-                    time = time + (1000 * 60 * 60 * 12);
-                else
-                    time = time + (1000 * 60 * 60 * 24);
+        txtDateTime = findViewById(R.id.txtDateTime);
+        btnTime = findViewById(R.id.btnTime);
+        btnDate = findViewById(R.id.btnDate);
+        //установка начальной даты и время
+        txtDateTime.setText(DateUtils.formatDateTime(this,dateTime.getTimeInMillis(),DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
+        //установка обработчика выбора даты
+        DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOFmONTH) {
+                dateTime.set(Calendar.YEAR,year);
+                dateTime.set(Calendar.MONTH,monthOfYear);
+                dateTime.set(Calendar.DAY_OF_MONTH,dayOFmONTH);
+                txtDateTime.setText(DateUtils.formatDateTime(getApplicationContext(),dateTime.getTimeInMillis(),
+                        DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
             }
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time, 10000, pendingIntent);
-        } else {
-            alarmManager.cancel(pendingIntent);
-            Toast.makeText(MainActivity.this, "ALARM OFF", Toast.LENGTH_SHORT).show();
-        }
+        };
+        TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hourOfDay, int Minutes) {
+                dateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                dateTime.set(Calendar.MINUTE, Minutes);
+                txtDateTime.setText(DateUtils.formatDateTime(getApplicationContext(),dateTime.getTimeInMillis(),
+                        DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
+            }
+        };
+        btnTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new TimePickerDialog(MainActivity.this,t,dateTime.get(Calendar.HOUR_OF_DAY),dateTime.get(Calendar.MINUTE),true).show();
+            }
+        });
+        btnDate.setOnClickListener(view -> new DatePickerDialog(MainActivity.this,d,dateTime.get(Calendar.YEAR),dateTime.get(Calendar.MONTH),dateTime.get(Calendar.DAY_OF_MONTH)).show());
     }
 }

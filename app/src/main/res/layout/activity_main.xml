@@ -5,18 +5,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/txtDateTime"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:text="@string/twText"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="100dp"
+        android:textSize="10pt"/>
 
-    <ToggleButton
-        android:id="@+id/toggleButton"
+
+    <Button
+        android:id="@+id/btnTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="20dp"
-        android:checked="false"
-        android:onClick="OnToggleClicked" />
+        android:text="@string/chTimeBtnText"
+        android:layout_marginTop="60dp"/>
+
+    <Button
+        android:id="@+id/btnDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/chDateBtnText"
+        android:layout_marginTop="20dp"/>
 </LinearLayout>
